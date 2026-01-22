@@ -42,6 +42,7 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th>Autor</th>
                 <th>Ano</th>
                 <th>Status</th>
+                <th>Ações</th>
             </tr>
 
             <?php foreach ($livros as $livro): ?>
@@ -51,6 +52,17 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= htmlspecialchars($livro['autor']) ?></td>
                     <td><?= $livro['ano_publicacao'] ?></td>
                     <td><?= $livro['status'] ?></td>
+                    <td>
+                    <td>
+                        <a href="editar_livro.php?id=<?= $livro['id'] ?>">Editar</a>
+
+                        <form action="excluir_livro.php" method="post" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este livro?');">
+                            <input type="hidden" name="id" value="<?= $livro['id'] ?>">
+                            <button type="submit">Excluir</button>
+                        </form>
+                    </td>
+ 
+
                 </tr>
             <?php endforeach; ?>
         </table>
