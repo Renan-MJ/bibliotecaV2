@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
+<html lang="pt-br" class="h-100"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,7 +11,15 @@
             --primary-color: #0f172a; /* Azul Marinho da Prefeitura */
             --accent-color: #3b82f6;  /* Azul de destaque */
         }
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        /* Ajustes de Estrutura para o Footer Fixo */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc; 
+            display: flex; /* Novo */
+            flex-direction: column; /* Novo */
+            min-height: 100vh; /* Novo */
+        }
         
         .navbar { background-color: var(--primary-color) !important; padding: 1rem 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .nav-link { color: #cbd5e1 !important; font-weight: 500; transition: all 0.3s; margin: 0 10px; }
@@ -67,3 +74,5 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
         </div>
     </div>
 </nav>
+
+<main class="flex-shrink-0">

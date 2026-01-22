@@ -37,11 +37,11 @@ if (!$leitor) {
                 <div class="card-header bg-dark text-white p-4" style="background-color: #0f172a !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0 fw-bold"><i class="fa-solid fa-user-pen me-2 text-info"></i> Editar Perfil do Leitor</h4>
-                        <span class="badge bg-info text-dark">ID: #<?= $leitor['id'] ?></span>
+                        <span class="badge bg-secondary">ID: #<?= $leitor['id'] ?></span>
                     </div>
                 </div>
                 
-                <div class="card-body p-4 p-md-5 bg-white">
+                <div class="card-body p-4 p-md-5 bg-white"> 
                     <form action="atualizar_leitor.php" method="post">
                         <input type="hidden" name="id" value="<?= $leitor['id'] ?>">
 
