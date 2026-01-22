@@ -1,7 +1,8 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
-session_start();
+include_once __DIR__ . '/includes/header.php';
 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 $mensagem_sucesso = $_SESSION['sucesso'] ?? '';
 unset($_SESSION['sucesso']);
 
@@ -13,76 +14,115 @@ SELECT e.id, l.id AS livro_id, l.titulo, le.id AS leitor_id, le.nome, le.numero_
 FROM emprestimos e
 JOIN livros l ON e.livro_id = l.id
 JOIN leitores le ON e.leitor_id = le.id
-ORDER BY e.id DESC
+ORDER BY e.data_devolucao_real ASC, e.data_devolucao_prevista ASC
 ";
 $emprestimos = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Listar Empréstimos</title>
-</head>
-<body>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Controle de Empréstimos</h2>
+            <p class="text-muted small">Gerencie prazos, devoluções e alertas de atraso.</p>
+        </div>
+        <a href="cadastrar_emprestimo.php" class="btn btn-primary shadow-sm" style="background-color: #0f172a; border: none;">
+            <i class="fa-solid fa-handshake-angle me-2"></i> Novo Empréstimo
+        </a>
+    </div>
 
-<h1>Lista de Empréstimos</h1>
+    <?php if ($mensagem_sucesso): ?>
+        <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-check-circle me-2"></i> <?= $mensagem_sucesso ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
-<?php if ($mensagem_sucesso): ?>
-    <p style="color:green;"><?= $mensagem_sucesso ?></p>
-<?php endif; ?>
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4 py-3">Livro</th>
+                        <th class="py-3">Leitor</th>
+                        <th class="py-3">Datas (Saída/Prazo)</th>
+                        <th class="py-3 text-center">Status</th>
+                        <th class="py-3 text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="text-secondary">
+                    <?php if (empty($emprestimos)): ?>
+                        <tr><td colspan="5" class="text-center py-5">Nenhum empréstimo registrado.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($emprestimos as $e): 
+                            $devolvido = !empty($e['data_devolucao_real']);
+                            $atrasado = (!$devolvido && $e['data_devolucao_prevista'] < $data_hoje);
+                            
+                            // Definição de Cores e Rótulos
+                            if ($devolvido) {
+                                $badgeClass = "bg-secondary-subtle text-secondary";
+                                $statusLabel = "Devolvido";
+                                $rowClass = "opacity-75";
+                            } elseif ($atrasado) {
+                                $badgeClass = "bg-danger-subtle text-danger";
+                                $statusLabel = "Atrasado";
+                                $rowClass = "table-danger";
+                            } else {
+                                $badgeClass = "bg-info-subtle text-info-emphasis";
+                                $statusLabel = "Em aberto";
+                                $rowClass = "";
+                            }
+                        ?>
+                        <tr class="<?= $rowClass ?>">
+                            <td class="ps-4">
+                                <span class="text-dark fw-bold d-block"><?= htmlspecialchars($e['titulo']) ?></span>
+                                <span class="text-muted small">ID Livro: #<?= $e['livro_id'] ?></span>
+                            </td>
+                            <td>
+                                <span class="text-dark d-block"><?= htmlspecialchars($e['nome']) ?></span>
+                                <span class="text-muted small">Matrícula: <?= $e['numero_cadastro'] ?></span>
+                            </td>
+                            <td class="small">
+                                <div><i class="fa-solid fa-calendar-minus me-1 text-muted"></i> <?= date('d/m/Y', strtotime($e['data_emprestimo'])) ?></div>
+                                <div class="fw-bold"><i class="fa-solid fa-calendar-check me-1 text-muted"></i> <?= date('d/m/Y', strtotime($e['data_devolucao_prevista'])) ?></div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill <?= $badgeClass ?> px-3 py-2 text-uppercase" style="font-size: 0.65rem;">
+                                    <?= $statusLabel ?>
+                                </span>
+                                <?php if($devolvido): ?>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Em: <?= date('d/m/Y', strtotime($e['data_devolucao_real'])) ?></div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <?php if (!$devolvido): ?>
+                                        <form action="registrar_devolucao.php" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="<?= $e['id'] ?>">
+                                            <button type="submit" class="btn btn-sm btn-white border text-success" title="Registrar Devolução">
+                                                <i class="fa-solid fa-arrow-rotate-left"></i>
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
 
-<a href="cadastrar_emprestimo.php">Registrar Novo Empréstimo</a><br><br>
+                                    <a href="editar_emprestimo.php?id=<?= $e['id'] ?>" class="btn btn-sm btn-white border text-primary" title="Editar Datas">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
 
-<table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Código do Livro</th>
-            <th>Título do Livro</th>
-            <th>Número de Cadastro do Leitor</th>
-            <th>Nome do Leitor</th>
-            <th>Data do Empréstimo</th>
-            <th>Prazo de Devolução</th>
-            <th>Devolução Real</th>
-            <th>Atrasado?</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($emprestimos as $e):
-            $atrasado = (!$e['data_devolucao_real'] && $e['data_devolucao_prevista'] < $data_hoje);
-        ?>
-        <tr style="<?= $atrasado ? 'background-color:#fdd;' : '' ?>">
-            <td><?= $e['livro_id'] ?></td>
-            <td><?= htmlspecialchars($e['titulo']) ?></td>
-            <td><?= $e['numero_cadastro'] ?></td>
-            <td><?= htmlspecialchars($e['nome']) ?></td>
-            <td><?= $e['data_emprestimo'] ?></td>
-            <td><?= $e['data_devolucao_prevista'] ?></td>
-            <td><?= $e['data_devolucao_real'] ?? '-' ?></td>
-            <td><?= $atrasado ? 'Atrasado!' : '-' ?></td>
-            <td>
-                <?php if (!$e['data_devolucao_real']): ?>
-                    <form action="registrar_devolucao.php" method="post" style="display:inline;">
-                        <input type="hidden" name="id" value="<?= $e['id'] ?>">
-                        <button type="submit">Registrar Devolução</button>
-                    </form>
-                <?php else: ?>
-                    <span>Devolvido</span>
-                <?php endif; ?>
+                                    <form action="excluir_emprestimo.php" method="post" class="d-inline" onsubmit="return confirm('Excluir este registro permanentemente?');">
+                                        <input type="hidden" name="id" value="<?= $e['id'] ?>">
+                                        <button type="submit" class="btn btn-sm btn-white border text-danger">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-                <a href="editar_emprestimo.php?id=<?= $e['id'] ?>">Editar</a>
-
-                <form action="excluir_emprestimo.php" method="post" style="display:inline;" 
-                      onsubmit="return confirm('Tem certeza que deseja excluir este empréstimo?');">
-                    <input type="hidden" name="id" value="<?= $e['id'] ?>">
-                    <button type="submit">Excluir</button>
-                </form>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
-
-</body>
-</html>
+<?php include_once __DIR__ . '/includes/footer.php'; ?>

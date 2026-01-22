@@ -1,10 +1,13 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
+include_once __DIR__ . '/includes/header.php';
 
 $id = $_GET['id'] ?? null;
 
 if (!$id) {
-    die('ID inválido');
+    echo "<div class='container mt-5'><p class='alert alert-danger shadow-sm'>ID inválido.</p></div>";
+    include_once __DIR__ . '/includes/footer.php';
+    exit;
 }
 
 $sql = "SELECT * FROM leitores WHERE id = :id";
@@ -13,60 +16,102 @@ $stmt->execute([':id' => $id]);
 $leitor = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$leitor) {
-    die('Leitor não encontrado');
+    echo "<div class='container mt-5'><p class='alert alert-danger shadow-sm'>Leitor não encontrado.</p></div>";
+    include_once __DIR__ . '/includes/footer.php';
+    exit;
 }
 ?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Leitor</title>
-</head>
-<body>
 
-<h1>Editar Leitor</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="listar_leitores.php" class="text-decoration-none text-muted">Leitores</a></li>
+                    <li class="breadcrumb-item active fw-bold" aria-current="page">Editar Cadastro</li>
+                </ol>
+            </nav>
 
-<form action="atualizar_leitor.php" method="post">
-    <input type="hidden" name="id" value="<?= $leitor['id'] ?>">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white p-4" style="background-color: #0f172a !important;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 fw-bold"><i class="fa-solid fa-user-pen me-2 text-info"></i> Editar Perfil do Leitor</h4>
+                        <span class="badge bg-info text-dark">ID: #<?= $leitor['id'] ?></span>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form action="atualizar_leitor.php" method="post">
+                        <input type="hidden" name="id" value="<?= $leitor['id'] ?>">
 
-    <label>
-        Número de cadastro:<br>
-        <input type="number" name="numero_cadastro" value="<?= $leitor['numero_cadastro'] ?>" required>
-    </label><br><br>
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-muted small text-uppercase">Nº de Cadastro</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-id-card-clip text-muted"></i></span>
+                                    <input type="number" name="numero_cadastro" class="form-control border-start-0 ps-0" value="<?= $leitor['numero_cadastro'] ?>" required>
+                                </div>
+                            </div>
 
-    <label>
-        Nome:<br>
-        <input type="text" name="nome" value="<?= htmlspecialchars($leitor['nome']) ?>" required>
-    </label><br><br>
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold text-muted small text-uppercase">Nome Completo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-muted"></i></span>
+                                    <input type="text" name="nome" class="form-control border-start-0 ps-0" value="<?= htmlspecialchars($leitor['nome']) ?>" required>
+                                </div>
+                            </div>
 
-    <label>
-        Filiação:<br>
-        <input type="text" name="filiacao" value="<?= htmlspecialchars($leitor['filiacao']) ?>">
-    </label><br><br>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-muted small text-uppercase">Filiação</label>
+                                <input type="text" name="filiacao" class="form-control bg-light-subtle" value="<?= htmlspecialchars($leitor['filiacao']) ?>" placeholder="Nome dos pais ou responsáveis">
+                            </div>
 
-    <label>
-        RG:<br>
-        <input type="text" name="rg" value="<?= htmlspecialchars($leitor['rg']) ?>">
-    </label><br><br>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-muted small text-uppercase">RG</label>
+                                <input type="text" name="rg" class="form-control" value="<?= htmlspecialchars($leitor['rg']) ?>">
+                            </div>
 
-    <label>
-        Telefone:<br>
-        <input type="text" name="telefone" value="<?= htmlspecialchars($leitor['telefone']) ?>">
-    </label><br><br>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-muted small text-uppercase">Telefone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fa-solid fa-phone"></i></span>
+                                    <input type="text" name="telefone" class="form-control" value="<?= htmlspecialchars($leitor['telefone']) ?>">
+                                </div>
+                            </div>
 
-    <label>
-        Email:<br>
-        <input type="email" name="email" value="<?= htmlspecialchars($leitor['email']) ?>">
-    </label><br><br>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-muted small text-uppercase">E-mail</label>
+                                <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($leitor['email']) ?>">
+                            </div>
 
-    <label>
-        Endereço:<br>
-        <input type="text" name="endereco" value="<?= htmlspecialchars($leitor['endereco']) ?>">
-    </label><br><br>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-muted small text-uppercase">Endereço Residencial</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fa-solid fa-location-dot"></i></span>
+                                    <input type="text" name="endereco" class="form-control" value="<?= htmlspecialchars($leitor['endereco']) ?>">
+                                </div>
+                            </div>
+                        </div>
 
-    <button type="submit">Atualizar</button>
-    <a href="listar_leitores.php">Cancelar</a>
-</form>
+                        <div class="hr-text text-muted my-5"><hr></div>
 
-</body>
-</html>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="listar_leitores.php" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+                                <i class="fa-solid fa-arrow-left me-2"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm" style="background-color: #0f172a; border: none;">
+                                <i class="fa-solid fa-rotate me-2 text-info"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light py-3 text-center">
+                    <small class="text-muted">Certifique-se de conferir os documentos originais antes de atualizar os dados do cidadão.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php include_once __DIR__ . '/includes/footer.php'; ?>

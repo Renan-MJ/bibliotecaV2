@@ -1,31 +1,48 @@
 <?php
-
 require_once __DIR__ . '/../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    die('Acesso inválido');
+    header('Location: listar_livros.php');
+    exit;
 }
 
-$id = $_POST['id'] ?? null;
+// Capturando os novos campos da interface moderna
+$id     = $_POST['id'] ?? null;
 $titulo = $_POST['titulo'] ?? '';
-$autor = $_POST['autor'] ?? '';
-$ano_publicacao = $_POST['ano_publicacao'] ?? '';
+$autor  = $_POST['autor'] ?? '';
+$cdd    = $_POST['cdd'] ?? ''; // Novo campo
+$status = $_POST['status'] ?? 'Disponível'; // Novo campo
 
-if (!$id || $titulo === '' || $autor === '' || $ano_publicacao === '') {
-    die('Dados inválidos');
+// Validação (Removido o ano_publicacao daqui)
+if (!$id || empty($titulo) || empty($autor)) {
+    // Redireciona com erro caso falte algo essencial
+    header('Location: listar_livros.php?erro=dados_invalidos');
+    exit;
 }
 
-$sql = "UPDATE livros 
-        SET titulo = :titulo, autor = :autor, ano_publicacao = :ano_publicacao
-        WHERE id = :id";
+try {
+    // SQL atualizada: removido ano_publicacao, adicionado cdd e status
+    $sql = "UPDATE livros 
+            SET titulo = :titulo, 
+                autor = :autor, 
+                cdd = :cdd, 
+                status = :status
+            WHERE id = :id";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute([
-    ':titulo' => $titulo,
-    ':autor' => $autor,
-    ':ano_publicacao' => $ano_publicacao,
-    ':id' => $id
-]);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':titulo' => $titulo,
+        ':autor'  => $autor,
+        ':cdd'    => $cdd,
+        ':status' => $status,
+        ':id'     => $id
+    ]);
 
-header('Location: listar_livros.php');
-exit;
+    // Redireciona com sucesso
+    header('Location: listar_livros.php?sucesso=atualizado');
+    exit;
+
+} catch (PDOException $e) {
+    // Em caso de erro no banco (ex: coluna não existe)
+    die("Erro ao atualizar no banco de dados: " . $e->getMessage());
+}
