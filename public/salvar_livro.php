@@ -14,13 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Captura todos os campos necessários, incluindo o que estava causando erro
+// Captura todos os campos necessários
 $numero_registro = trim($_POST['numero_registro'] ?? '');
 $titulo          = trim($_POST['titulo'] ?? '');
 $autor           = trim($_POST['autor'] ?? '');
 $cdd             = trim($_POST['cdd'] ?? '');
 
-// Validação (numero_registro agora é obrigatório para não dar erro no banco)
+// Validação
 if (empty($numero_registro) || empty($titulo) || empty($autor)) {
     $_SESSION['erro'] = "Número de Registro, Título e Autor são obrigatórios.";
     header('Location: cadastrar_livro.php');
@@ -28,8 +28,7 @@ if (empty($numero_registro) || empty($titulo) || empty($autor)) {
 }
 
 try {
-    // SQL atualizada com todas as colunas da sua tabela
-    // Importante: Note que usei STATUS (em maiúsculo) para bater com sua descrição
+    // SQL atualizada
     $sql = "INSERT INTO livros (numero_registro, titulo, cdd, autor, STATUS) 
             VALUES (:n_registro, :titulo, :cdd, :autor, 'Disponível')";
     
@@ -41,14 +40,16 @@ try {
         ':cdd'        => $cdd,
         ':autor'      => $autor
     ]);
+     
+    // --- ALTERAÇÃO AQUI ---
+    // Define a mensagem de sucesso na sessão antes de redirecionar
+    $_SESSION['sucesso'] = "O exemplar <strong>" . htmlspecialchars($titulo) . "</strong> foi cadastrado com sucesso no acervo!";
 
-    // Sucesso! Limpa o buffer e vai para a listagem
     ob_end_clean();
-    header('Location: listar_livros.php?sucesso=1');
+    header('Location: listar_livros.php'); // Removido o ?sucesso=1
     exit;
 
 } catch (PDOException $e) {
     ob_end_clean();
-    // Mensagem amigável para debug se algo mais falhar
     die("Erro Crítico no Banco de Dados: " . $e->getMessage());
 }

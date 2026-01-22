@@ -1,27 +1,26 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 
+// ADICIONE ISSO: Inicia a sessão para que a mensagem funcione
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: listar_livros.php');
     exit;
 }
 
-// Capturando os novos campos da interface moderna
 $id     = $_POST['id'] ?? null;
 $titulo = $_POST['titulo'] ?? '';
 $autor  = $_POST['autor'] ?? '';
-$cdd    = $_POST['cdd'] ?? ''; // Novo campo
-$status = $_POST['status'] ?? 'Disponível'; // Novo campo
+$cdd    = $_POST['cdd'] ?? '';
+$status = $_POST['status'] ?? 'Disponível';
 
-// Validação (Removido o ano_publicacao daqui)
 if (!$id || empty($titulo) || empty($autor)) {
-    // Redireciona com erro caso falte algo essencial
     header('Location: listar_livros.php?erro=dados_invalidos');
     exit;
 }
 
 try {
-    // SQL atualizada: removido ano_publicacao, adicionado cdd e status
     $sql = "UPDATE livros 
             SET titulo = :titulo, 
                 autor = :autor, 
@@ -38,11 +37,12 @@ try {
         ':id'     => $id
     ]);
 
-    // Redireciona com sucesso
-    header('Location: listar_livros.php?sucesso=atualizado');
+    // ALTERADO: Agora salva na sessão para a listagem exibir o alerta verde
+    $_SESSION['sucesso'] = "O cadastro de <strong>" . htmlspecialchars($titulo) . "</strong> foi atualizado com sucesso!";
+
+    header('Location: listar_livros.php');
     exit;
 
 } catch (PDOException $e) {
-    // Em caso de erro no banco (ex: coluna não existe)
     die("Erro ao atualizar no banco de dados: " . $e->getMessage());
 }

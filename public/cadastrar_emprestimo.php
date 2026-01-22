@@ -12,7 +12,6 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-dark text-white p-4" style="background-color: #0f172a !important;">
                     <h4 class="mb-0 fw-bold">
@@ -71,11 +70,10 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="mb-4 col-md-6">
                             <label class="form-label fw-bold text-muted small text-uppercase">Horário de Saída</label>
-                            <input type="text" class="form-control bg-light" value="<?= date('H:i') ?>" readonly>
-                            <input type="hidden" name="data_emprestimo" value="<?= date('H:i:s') ?>">
-                            <small class="text-muted" style="font-size: 0.7rem;">O sistema registrará o horário atual automaticamente.</small>
+                            <input type="text" class="form-control bg-light" value="<?= date('H:i') ?>" readonly disabled>
+                            <small class="text-muted" style="font-size: 0.7rem;">O horário é registrado automaticamente pelo sistema.</small>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center pt-4 border-top">
@@ -92,17 +90,14 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
 </div>
 
 <script>
-    // Lógica para sugerir devolução em 7 dias automaticamente
-    const inputSaida = document.getElementById('data_emprestimo');
     const inputRetorno = document.getElementById('data_devolucao_prevista');
 
     function calcularSugestao() {
-        let data = new Date(); // Pega o momento atual
-        data.setDate(data.getDate() + 7); // Soma 7 dias
+        let data = new Date(); 
+        data.setDate(data.getDate() + 7); 
         inputRetorno.value = data.toISOString().split('T')[0];
     }
 
-    inputSaida.addEventListener('change', calcularSugestao);
     window.onload = calcularSugestao;
 </script>
 

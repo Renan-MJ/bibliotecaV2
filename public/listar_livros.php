@@ -2,6 +2,11 @@
 require_once __DIR__ . '/../config/database.php';
 include_once __DIR__ . '/includes/header.php';
 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+$mensagem_sucesso = $_SESSION['sucesso'] ?? '';
+unset($_SESSION['sucesso']);
+
+
 // 1. Configurações de Paginação
 $itens_por_pagina = 10;
 $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
@@ -80,6 +85,14 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </form>
         </div>
     </div>
+
+    <?php if ($mensagem_sucesso): ?>
+        <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4 alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <div><?= $mensagem_sucesso ?></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
     <?php if (!empty($busca) && count($livros) === 0): ?>
         <div class="alert alert-warning border-0 shadow-sm mb-4">
