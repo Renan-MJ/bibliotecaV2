@@ -111,12 +111,16 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php else: ?>
                         <?php foreach ($livros as $livro): ?>
                             <tr>
-                                <td class="ps-4">
-                                    <span class="text-dark fw-medium d-block">#<?= $livro['id'] ?></span>
-                                    <span class="badge bg-secondary-subtle text-secondary-emphasis" style="font-size: 0.7rem;">
-                                        Reg: <?= htmlspecialchars($livro['numero_registro'] ?? 'S/R') ?>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <span class="text-dark fw-bold" style="font-size: 1rem;">
+                                        Reg: <?= htmlspecialchars($livro['numero_registro'] ?? 'N/A') ?>
                                     </span>
-                                </td>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    ID: #<?= $livro['id'] ?>
+                                </small>
+                            </td>
                                 <td>
                                     <span class="text-dark fw-semibold d-block"><?= htmlspecialchars($livro['titulo']) ?></span>
                                     <span class="text-muted small">Ref: CDD-<?= htmlspecialchars($livro['cdd'] ?? 'N/A') ?></span>

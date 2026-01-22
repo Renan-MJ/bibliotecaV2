@@ -62,8 +62,7 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
             </ul>
             
             <div class="user-profile d-none d-lg-flex align-items-center">
-                <small class="me-3 text-white-50">Olá, <strong>Administrador</strong></small>
-                <a href="logout.php" class="btn btn-outline-light btn-sm rounded-pill px-3">Sair</a>
+                <small class="me-3 text-white-50">Olá, <strong>Gestor(a)</strong></small>
             </div>
         </div>
     </div>
