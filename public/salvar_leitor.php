@@ -17,8 +17,8 @@ if ($numero_cadastro === '' || $nome === '') {
     die('Número de cadastro e nome são obrigatórios.');
 }
 
-$sql = "INSERT INTO leitores (numero_cadastro, nome, filiacao, rg, telefone, email, endereco)
-        VALUES (:numero_cadastro, :nome, :filiacao, :rg, :telefone, :email, :endereco)";
+$sql = "INSERT INTO leitores (numero_cadastro, nome, filiacao, rg, telefone, email, endereco, data_cadastro)
+        VALUES (:numero_cadastro, :nome, :filiacao, :rg, :telefone, :email, :endereco, CURDATE())";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([

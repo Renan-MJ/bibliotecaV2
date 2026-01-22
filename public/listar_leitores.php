@@ -37,6 +37,7 @@ unset($_SESSION['sucesso']);
             <th>Telefone</th>
             <th>Email</th>
             <th>Endereço</th>
+            <th>Data de Cadastro</th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -56,6 +57,7 @@ unset($_SESSION['sucesso']);
             <td><?= htmlspecialchars($leitor['telefone']) ?></td>
             <td><?= htmlspecialchars($leitor['email']) ?></td>
             <td><?= htmlspecialchars($leitor['endereco']) ?></td>
+            <td><?= $leitor['data_cadastro'] ?></td>
             <td>
                 <a href="editar_leitor.php?id=<?= $leitor['id'] ?>">Editar</a>
 
