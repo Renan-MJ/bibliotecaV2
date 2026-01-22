@@ -16,9 +16,9 @@
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: #f8fafc; 
-            display: flex; /* Novo */
-            flex-direction: column; /* Novo */
-            min-height: 100vh; /* Novo */
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
         }
         
         .navbar { background-color: var(--primary-color) !important; padding: 1rem 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
@@ -27,6 +27,10 @@
         .nav-link.active { color: #ffffff !important; border-bottom: 2px solid var(--accent-color); }
         .navbar-brand { font-weight: 700; letter-spacing: -0.5px; }
         .user-profile { border-left: 1px solid #334155; padding-left: 20px; color: white; }
+        
+        /* Efeito opcional para o botão de recarregar */
+        .btn-reload { color: #64748b; transition: all 0.3s; cursor: pointer; }
+        .btn-reload:hover { color: #3b82f6; transform: rotate(90deg); }
     </style>
 </head>
 <body>
@@ -69,6 +73,9 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
             </ul>
             
             <div class="user-profile d-none d-lg-flex align-items-center">
+                <a href="javascript:location.reload();" class="btn-reload me-3" title="Recarregar página">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </a>
                 <small class="me-3 text-white-50">Olá, <strong>Gestor(a)</strong></small>
             </div>
         </div>

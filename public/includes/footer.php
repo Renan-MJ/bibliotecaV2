@@ -8,8 +8,10 @@
                     <img src="img/logo_prefeitura.png" alt="Brasão" height="90">
                 </div>
                 <div class="col-md-4 text-md-end">
-                    <a href="#" class="text-muted text-decoration-none small me-3">Suporte</a>
-                    <a href="#" class="text-muted text-decoration-none small">Privacidade</a>
+                    <a href="suporte.php" class="text-muted text-decoration-none small me-3">
+                        <i class="fa-solid fa-headset me-1"></i> Suporte
+                    </a>
+                    <a href="privacidade.php" class="text-muted text-decoration-none small">Privacidade</a>
                 </div>
             </div>
         </div>
