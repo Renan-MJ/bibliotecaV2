@@ -195,7 +195,7 @@ $ultimosEmprestimos = $pdo->query("
                     </div>
                 </div>
                 <div class="card-footer bg-white border-0 p-4 text-center">
-                    <a href="listar_emprestimos.php" class="text-primary text-decoration-none small fw-bold">Ver histórico completo <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                    <a href="historico_geral.php" class="text-primary text-decoration-none small fw-bold">Ver histórico completo <i class="fa-solid fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
