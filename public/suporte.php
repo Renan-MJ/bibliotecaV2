@@ -46,6 +46,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-12 mt-4">
+                        <div class="card border-warning bg-light">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-warning-emphasis">Cópia de Segurança (Backup)</h6>
+                                    <p class="small text-muted mb-0">Recomendamos baixar uma cópia semanalmente e salvar em um pen drive.</p>
+                                </div>
+                                <a href="gerar_backup.php" class="btn btn-warning fw-bold">
+                                    <i class="fa-solid fa-download me-2"></i> Baixar Backup Agora
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
