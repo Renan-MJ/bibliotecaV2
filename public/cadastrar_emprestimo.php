@@ -71,9 +71,11 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
                             </div>
                         </div>
 
-                        <div class="alert alert-info border-0 shadow-sm small">
-                            <i class="fa-solid fa-circle-info me-2"></i>
-                            O status do livro será alterado automaticamente para <strong>Emprestado</strong> após a confirmação.
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase">Horário de Saída</label>
+                            <input type="text" class="form-control bg-light" value="<?= date('H:i') ?>" readonly>
+                            <input type="hidden" name="data_emprestimo" value="<?= date('H:i:s') ?>">
+                            <small class="text-muted" style="font-size: 0.7rem;">O sistema registrará o horário atual automaticamente.</small>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center pt-4 border-top">
@@ -95,8 +97,8 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
     const inputRetorno = document.getElementById('data_devolucao_prevista');
 
     function calcularSugestao() {
-        let data = new Date(inputSaida.value);
-        data.setDate(data.getDate() + 8); // +7 dias de empréstimo
+        let data = new Date(); // Pega o momento atual
+        data.setDate(data.getDate() + 7); // Soma 7 dias
         inputRetorno.value = data.toISOString().split('T')[0];
     }
 

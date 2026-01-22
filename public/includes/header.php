@@ -33,7 +33,7 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
     <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="index.php">
             <i class="fa-solid fa-landmark-flag me-2 text-info"></i>
-            <span>BIBLIO<span class="text-info">V2</span></span>
+            <span>BIBLIO<span class="text-info">TECA</span></span>
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

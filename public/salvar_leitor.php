@@ -26,9 +26,9 @@ if (empty($numero_cadastro) || empty($nome)) {
 }
 
 try {
-    // SQL com data de cadastro automática via CURDATE()
+    // SQL alterado: trocamos CURDATE() por NOW() para capturar o horário exato
     $sql = "INSERT INTO leitores (numero_cadastro, nome, filiacao, rg, telefone, email, endereco, data_cadastro)
-            VALUES (:numero_cadastro, :nome, :filiacao, :rg, :telefone, :email, :endereco, CURDATE())";
+            VALUES (:numero_cadastro, :nome, :filiacao, :rg, :telefone, :email, :endereco, NOW())";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
@@ -47,8 +47,8 @@ try {
     exit;
 
 } catch (PDOException $e) {
-    // Tratamento de erro (ex: número de cadastro duplicado se for chave única)
-    $_SESSION['erro'] = "Erro ao realizar o cadastro. Verifique se o número de cadastro já existe.";
+    // Caso o erro seja de coluna não encontrada, certifique-se de ter rodado o ALTER TABLE enviado antes
+    $_SESSION['erro'] = "Erro ao realizar o cadastro. Detalhes: " . $e->getMessage();
     header('Location: cadastrar_leitor.php');
     exit;
 }
