@@ -18,8 +18,22 @@ if (!$id) {
 }
 
 try {
-    // Antes de excluir, poderíamos verificar se o leitor possui empréstimos ativos
-    // mas por enquanto, manteremos a exclusão direta conforme seu código original
+    // 1. Verificação Proativa: O leitor possui empréstimos pendentes?
+    $stmtCheck = $pdo->prepare("SELECT id FROM emprestimos WHERE leitor_id = :id AND status = 'Pendente' LIMIT 1");
+    $stmtCheck->execute([':id' => $id]);
+    $emprestimo = $stmtCheck->fetch();
+
+    if ($emprestimo) {
+        // Se encontrou pendência, bloqueia e oferece link para o registro
+        $_SESSION['erro'] = "<strong>Bloqueio de Segurança:</strong> Este leitor possui livros emprestados no momento.<br>
+                            <a href='listar_emprestimos.php?busca=" . $emprestimo['id'] . "' class='btn btn-sm btn-outline-danger mt-2 text-decoration-none'>
+                                <i class='fa-solid fa-arrow-right me-1'></i> Ver empréstimo pendente
+                            </a>";
+        header('Location: listar_leitores.php');
+        exit;
+    }
+
+    // 2. Tenta a exclusão direta (caso não haja pendências)
     $sql = "DELETE FROM leitores WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':id' => $id]);
@@ -28,8 +42,8 @@ try {
     $_SESSION['sucesso'] = "O registro do leitor foi <strong>removido permanentemente</strong> do sistema.";
     
 } catch (PDOException $e) {
-    // Se houver erro (ex: chave estrangeira se o leitor tiver empréstimos)
-    $_SESSION['erro'] = "Este leitor não pode ser excluído porque possui históricos vinculados a ele.";
+    // 3. Caso o leitor possua histórico de empréstimos já DEVOLVIDOS que impedem a exclusão via Banco (FK)
+    $_SESSION['erro'] = "Este leitor não pode ser removido definitivamente pois possui <strong>Empréstimos</strong> registrado.";
 }
 
 header('Location: listar_leitores.php');

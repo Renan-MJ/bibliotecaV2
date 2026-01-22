@@ -2,22 +2,27 @@
 require_once __DIR__ . '/../config/database.php';
 include_once __DIR__ . '/includes/header.php';
 
+// 1. Inicia a sessão e captura mensagens (Sucesso e Erro)
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
 $mensagem_sucesso = $_SESSION['sucesso'] ?? '';
+$mensagem_erro = $_SESSION['erro'] ?? '';
+
+// Limpa as mensagens para não repetirem ao atualizar a página
 unset($_SESSION['sucesso']);
+unset($_SESSION['erro']);
 
-
-// 1. Configurações de Paginação
+// 2. Configurações de Paginação
 $itens_por_pagina = 10;
 $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 if ($pagina_atual < 1) $pagina_atual = 1;
 $offset = ($pagina_atual - 1) * $itens_por_pagina;
 
-// 2. Lógica de Busca
+// 3. Lógica de Busca
 $busca = isset($_GET['busca']) ? trim($_GET['busca']) : '';
 $id_busca = is_numeric($busca) ? intval($busca) : 0;
 
-// 3. Consulta para contar o TOTAL
+// 4. Consulta para contar o TOTAL
 if (!empty($busca)) {
     $sql_count = "SELECT COUNT(*) FROM livros 
                   WHERE id = :id_exato 
@@ -36,7 +41,7 @@ if (!empty($busca)) {
 $total_registros = $stmt_count->fetchColumn();
 $total_paginas = ceil($total_registros / $itens_por_pagina);
 
-// 4. Consulta Principal com LIMIT e OFFSET
+// 5. Consulta Principal com LIMIT e OFFSET
 if (!empty($busca)) {
     $sql = "SELECT * FROM livros 
             WHERE id = :id_exato 
@@ -88,8 +93,16 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <?php if ($mensagem_sucesso): ?>
         <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4 alert-dismissible fade show" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i>
+            <i class="fa-solid fa-circle-check me-2 fa-lg"></i>
             <div><?= $mensagem_sucesso ?></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($mensagem_erro): ?>
+        <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4 alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2 fa-lg"></i>
+            <div><?= $mensagem_erro ?></div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
@@ -124,31 +137,28 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php else: ?>
                         <?php foreach ($livros as $livro): ?>
                             <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <span class="text-dark fw-bold" style="font-size: 1rem;">
-                                        Reg: <?= htmlspecialchars($livro['numero_registro'] ?? 'N/A') ?>
-                                    </span>
-                                </div>
-                                <small class="text-muted" style="font-size: 0.75rem;">
-                                    ID: #<?= $livro['id'] ?>
-                                </small>
-                            </td>
+                                <td class="ps-4">
+                                    <span class="text-dark fw-bold">Reg: <?= htmlspecialchars($livro['numero_registro'] ?? 'N/A') ?></span><br>
+                                    <small class="text-muted">ID: #<?= $livro['id'] ?></small>
+                                </td>
                                 <td>
                                     <span class="text-dark fw-semibold d-block"><?= htmlspecialchars($livro['titulo']) ?></span>
                                     <span class="text-muted small">Ref: CDD-<?= htmlspecialchars($livro['cdd'] ?? 'N/A') ?></span>
                                 </td>
                                 <td><?= htmlspecialchars($livro['autor']) ?></td>   
                                 <td class="text-center">
-                                    <?php $statusClass = ($livro['STATUS'] == 'Disponível') ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis'; ?>
-                                    <span class="badge rounded-pill <?= $statusClass ?> px-3"><?= $livro['STATUS'] ?></span>
+                                    <?php 
+                                    $status = $livro['STATUS'] ?? $livro['status'] ?? 'Indisponível';
+                                    $statusClass = ($status == 'Disponível') ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis'; 
+                                    ?>
+                                    <span class="badge rounded-pill <?= $statusClass ?> px-3"><?= $status ?></span>
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group shadow-sm">
-                                        <a href="editar_livro.php?id=<?= $livro['id'] ?>" class="btn btn-white btn-sm border text-primary"><i class="fa-solid fa-pen-to-square"></i></a>
-                                        <form action="excluir_livro.php" method="post" class="d-inline" onsubmit="return confirm('Deseja excluir?');">
+                                        <a href="editar_livro.php?id=<?= $livro['id'] ?>" class="btn btn-white btn-sm border text-primary" title="Editar"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        <form action="excluir_livro.php" method="post" class="d-inline" onsubmit="return confirm('Tem certeza que deseja remover este exemplar do acervo?');">
                                             <input type="hidden" name="id" value="<?= $livro['id'] ?>">
-                                            <button type="submit" class="btn btn-white btn-sm border text-danger"><i class="fa-solid fa-trash-can"></i></button>
+                                            <button type="submit" class="btn btn-white btn-sm border text-danger" title="Excluir"><i class="fa-solid fa-trash-can"></i></button>
                                         </form>
                                     </div>
                                 </td>
@@ -166,7 +176,6 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <li class="page-item <?= $pagina_atual <= 1 ? 'disabled' : '' ?>">
                         <a class="page-link text-dark" href="?pagina=<?= $pagina_atual - 1 ?>&busca=<?= urlencode($busca) ?>">Anterior</a>
                     </li>
-                    
                     <?php 
                     $inicio = max(1, $pagina_atual - 2);
                     $fim = min($total_paginas, $pagina_atual + 2);
@@ -175,7 +184,6 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <a class="page-link <?= $pagina_atual == $i ? 'bg-dark border-dark text-white' : 'text-dark' ?>" href="?pagina=<?= $i ?>&busca=<?= urlencode($busca) ?>"><?= $i ?></a>
                         </li>
                     <?php endfor; ?>
-
                     <li class="page-item <?= $pagina_atual >= $total_paginas ? 'disabled' : '' ?>">
                         <a class="page-link text-dark" href="?pagina=<?= $pagina_atual + 1 ?>&busca=<?= urlencode($busca) ?>">Próximo</a>
                     </li>
@@ -198,7 +206,6 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }, 500);
     });
 
-    // Mantém o foco no final do input após o refresh
     if (inputBusca.value !== "") {
         const val = inputBusca.value;
         inputBusca.focus();

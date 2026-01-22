@@ -2,20 +2,26 @@
 require_once __DIR__ . '/../config/database.php';
 include_once __DIR__ . '/includes/header.php';
 
+// 1. Inicia a sessão e captura mensagens de Sucesso e Erro
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
-$mensagem_sucesso = $_SESSION['sucesso'] ?? '';
-unset($_SESSION['sucesso']);
 
-// 1. Configurações de Paginação
+$mensagem_sucesso = $_SESSION['sucesso'] ?? '';
+$mensagem_erro = $_SESSION['erro'] ?? '';
+
+// Limpa as mensagens para não repetirem
+unset($_SESSION['sucesso']);
+unset($_SESSION['erro']);
+
+// 2. Configurações de Paginação
 $itens_por_pagina = 10;
 $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 if ($pagina_atual < 1) $pagina_atual = 1;
 $offset = ($pagina_atual - 1) * $itens_por_pagina;
 
-// 2. Lógica de Busca
+// 3. Lógica de Busca
 $busca = isset($_GET['busca']) ? trim($_GET['busca']) : '';
 
-// 3. Consulta para contar o TOTAL
+// 4. Consulta para contar o TOTAL
 if (!empty($busca)) {
     $sql_count = "SELECT COUNT(*) FROM leitores 
                   WHERE numero_cadastro LIKE :busca 
@@ -34,7 +40,7 @@ if (!empty($busca)) {
 $total_registros = $stmt_count->fetchColumn();
 $total_paginas = ceil($total_registros / $itens_por_pagina);
 
-// 4. Consulta Principal com LIMIT e OFFSET
+// 5. Consulta Principal com LIMIT e OFFSET
 if (!empty($busca)) {
     $sql = "SELECT * FROM leitores 
             WHERE numero_cadastro LIKE :busca 
@@ -44,14 +50,16 @@ if (!empty($busca)) {
             OR telefone LIKE :busca 
             ORDER BY id DESC LIMIT :limit OFFSET :offset";
     $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':limit', $itens_por_pagina, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->bindValue(':busca', '%' . $busca . '%', PDO::PARAM_STR);
 } else {
     $sql = "SELECT * FROM leitores ORDER BY id DESC LIMIT :limit OFFSET :offset";
     $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':limit', $itens_por_pagina, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 }
 
-$stmt->bindValue(':limit', $itens_por_pagina, PDO::PARAM_INT);
-$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $leitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -85,8 +93,16 @@ $leitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <?php if ($mensagem_sucesso): ?>
         <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4 alert-dismissible fade show" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i>
+            <i class="fa-solid fa-circle-check me-2 fa-lg"></i>
             <div><?= $mensagem_sucesso ?></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($mensagem_erro): ?>
+        <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4 alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2 fa-lg"></i>
+            <div><?= $mensagem_erro ?></div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
@@ -164,7 +180,6 @@ $leitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <li class="page-item <?= $pagina_atual <= 1 ? 'disabled' : '' ?>">
                         <a class="page-link text-dark" href="?pagina=<?= $pagina_atual - 1 ?>&busca=<?= urlencode($busca) ?>">Anterior</a>
                     </li>
-                    
                     <?php 
                     $inicio = max(1, $pagina_atual - 2);
                     $fim = min($total_paginas, $pagina_atual + 2);
@@ -175,7 +190,6 @@ $leitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                href="?pagina=<?= $i ?>&busca=<?= urlencode($busca) ?>"><?= $i ?></a>
                         </li>
                     <?php endfor; ?>
-
                     <li class="page-item <?= $pagina_atual >= $total_paginas ? 'disabled' : '' ?>">
                         <a class="page-link text-dark" href="?pagina=<?= $pagina_atual + 1 ?>&busca=<?= urlencode($busca) ?>">Próximo</a>
                     </li>
@@ -198,7 +212,6 @@ $leitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }, 500);
     });
 
-    // Mantém o foco e cursor no final
     if (inputBusca.value !== "") {
         const length = inputBusca.value.length;
         inputBusca.focus();
@@ -206,4 +219,4 @@ $leitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 </script>
 
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
+<?php include_once __DIR__ . '/includes/footer.php'; ?> 
