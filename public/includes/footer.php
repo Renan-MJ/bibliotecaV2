@@ -5,7 +5,7 @@
                     <span class="text-muted small">&copy; 2024 Prefeitura Municipal - Gestão de Biblioteca</span>
                 </div>
                 <div class="col-md-4 my-3 my-md-0">
-                    <img src="https://via.placeholder.com/120x40?text=Logo+Prefeitura" alt="Brasão" class="opacity-50">
+                    <img src="img/logoPRF.png" alt="Brasão" class="opacity-50">
                 </div>
                 <div class="col-md-4 text-md-end">
                     <a href="#" class="text-muted text-decoration-none small me-3">Suporte</a>
