@@ -15,6 +15,11 @@
         </label><br><br>
 
         <label>
+            CDD:<br>
+            <input type="text" name="cdd" required>
+        </label><br><br>
+
+        <label>
             Autor:<br>
             <input type="text" name="autor" required>
         </label><br><br>
