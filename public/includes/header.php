@@ -50,6 +50,12 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+        <li class="nav-item">
+            <a class="nav-link <?= strpos($_SERVER['PHP_SELF'], 'index.php') !== false ? 'active fw-bold' : '' ?>" href="index.php">
+                <i class="fa-solid fa-house me-1"></i> Início
+            </a>
+        </li>
         
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
