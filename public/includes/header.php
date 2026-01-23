@@ -76,6 +76,11 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
                 <a href="javascript:location.reload();" class="btn-reload me-3" title="Recarregar página">
                     <i class="fa-solid fa-rotate-right"></i>
                 </a>
+                <li class="nav-item">
+                    <a class="nav-link" href="consulta_cdd.php">
+                        <i class="fa-solid fa-file-arrow-down me-1 "></i> Baixar CDD
+                    </a>
+                </li>
                 <small class="me-3 text-white-50">Olá, <strong>Gestor(a)</strong></small>
             </div>
         </div>
