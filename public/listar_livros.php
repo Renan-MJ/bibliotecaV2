@@ -2,15 +2,11 @@
 require_once __DIR__ . '/../config/database.php';
 include_once __DIR__ . '/includes/header.php';
 
-// 1. Inicia a sessão e captura mensagens (Sucesso e Erro)
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 $mensagem_sucesso = $_SESSION['sucesso'] ?? '';
 $mensagem_erro = $_SESSION['erro'] ?? '';
-
-// Limpa as mensagens para não repetirem ao atualizar a página
-unset($_SESSION['sucesso']);
-unset($_SESSION['erro']);
+unset($_SESSION['sucesso'], $_SESSION['erro']);
 
 // 2. Configurações de Paginação
 $itens_por_pagina = 10;
@@ -18,46 +14,53 @@ $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 if ($pagina_atual < 1) $pagina_atual = 1;
 $offset = ($pagina_atual - 1) * $itens_por_pagina;
 
-// 3. Lógica de Busca
+// 3. Lógica de Busca com Seletor
 $busca = isset($_GET['busca']) ? trim($_GET['busca']) : '';
-$id_busca = is_numeric($busca) ? intval($busca) : 0;
+$tipo_busca = isset($_GET['tipo_busca']) ? $_GET['tipo_busca'] : 'todos';
+
+$condicoes = [];
+$params = [];
+
+if (!empty($busca)) {
+    if ($tipo_busca === 'id' && is_numeric($busca)) {
+        $condicoes[] = "id = :id_exato";
+        $params[':id_exato'] = intval($busca);
+    } elseif ($tipo_busca === 'titulo') {
+        $condicoes[] = "titulo LIKE :busca";
+        $params[':busca'] = '%' . $busca . '%';
+    } elseif ($tipo_busca === 'autor') {
+        $condicoes[] = "autor LIKE :busca";
+        $params[':busca'] = '%' . $busca . '%';
+    } elseif ($tipo_busca === 'registro') {
+        $condicoes[] = "numero_registro LIKE :busca";
+        $params[':busca'] = '%' . $busca . '%';
+    } elseif ($tipo_busca === 'cdd') { // NOVA CATEGORIA CDD
+        $condicoes[] = "cdd LIKE :busca";
+        $params[':busca'] = '%' . $busca . '%';
+    } else {
+        // Opção "Todos" agora inclui o CDD explicitamente
+        $condicoes[] = "(id = :id_exato OR titulo LIKE :busca OR autor LIKE :busca OR numero_registro LIKE :busca OR cdd LIKE :busca)";
+        $params[':id_exato'] = is_numeric($busca) ? intval($busca) : 0;
+        $params[':busca'] = '%' . $busca . '%';
+    }
+}
+
+$sql_where = !empty($condicoes) ? " WHERE " . implode(" AND ", $condicoes) : "";
 
 // 4. Consulta para contar o TOTAL
-if (!empty($busca)) {
-    $sql_count = "SELECT COUNT(*) FROM livros 
-                  WHERE id = :id_exato 
-                  OR titulo LIKE :busca 
-                  OR autor LIKE :busca 
-                  OR numero_registro LIKE :busca 
-                  OR cdd LIKE :busca";
-    $stmt_count = $pdo->prepare($sql_count);
-    $stmt_count->bindValue(':id_exato', $id_busca, PDO::PARAM_INT);
-    $stmt_count->bindValue(':busca', '%' . $busca . '%', PDO::PARAM_STR);
-    $stmt_count->execute();
-} else {
-    $sql_count = "SELECT COUNT(*) FROM livros";
-    $stmt_count = $pdo->query($sql_count);
-}
+$sql_count = "SELECT COUNT(*) FROM livros" . $sql_where;
+$stmt_count = $pdo->prepare($sql_count);
+$stmt_count->execute($params);
 $total_registros = $stmt_count->fetchColumn();
 $total_paginas = ceil($total_registros / $itens_por_pagina);
 
-// 5. Consulta Principal com LIMIT e OFFSET
-if (!empty($busca)) {
-    $sql = "SELECT * FROM livros 
-            WHERE id = :id_exato 
-            OR titulo LIKE :busca 
-            OR autor LIKE :busca 
-            OR numero_registro LIKE :busca 
-            OR cdd LIKE :busca 
-            ORDER BY id DESC LIMIT :limit OFFSET :offset";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':id_exato', $id_busca, PDO::PARAM_INT);
-    $stmt->bindValue(':busca', '%' . $busca . '%', PDO::PARAM_STR);
-} else {
-    $sql = "SELECT * FROM livros ORDER BY id DESC LIMIT :limit OFFSET :offset";
-    $stmt = $pdo->prepare($sql);
-}
+// 5. Consulta Principal
+$sql = "SELECT * FROM livros" . $sql_where . " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+$stmt = $pdo->prepare($sql);
 
+foreach ($params as $chave => $valor) {
+    $stmt->bindValue($chave, $valor);
+}
 $stmt->bindValue(':limit', $itens_por_pagina, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
@@ -78,12 +81,22 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="row mb-4">
         <div class="col-md-12">
             <form action="listar_livros.php" method="GET" id="formBusca" class="d-flex gap-2">
+                <select name="tipo_busca" class="form-select shadow-sm w-auto" onchange="this.form.submit()">
+                    <option value="todos" <?= $tipo_busca == 'todos' ? 'selected' : '' ?>>Todos</option>
+                    <option value="id" <?= $tipo_busca == 'id' ? 'selected' : '' ?>>ID</option>
+                    <option value="registro" <?= $tipo_busca == 'registro' ? 'selected' : '' ?>>Registro</option>
+                    <option value="titulo" <?= $tipo_busca == 'titulo' ? 'selected' : '' ?>>Título</option>
+                    <option value="autor" <?= $tipo_busca == 'autor' ? 'selected' : '' ?>>Autor</option>
+                    <option value="cdd" <?= $tipo_busca == 'cdd' ? 'selected' : '' ?>>CDD</option>
+                </select>
+                
                 <div class="input-group shadow-sm">
                     <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
                     <input type="text" name="busca" id="inputBusca" class="form-control border-start-0" 
-                           placeholder="Buscar por ID, registro, título ou autor..." 
+                           placeholder="Pesquisar..." 
                            value="<?= htmlspecialchars($busca) ?>" autocomplete="off">
                 </div>
+
                 <?php if (!empty($busca)): ?>
                     <a href="listar_livros.php" class="btn btn-outline-secondary">Limpar</a>
                 <?php endif; ?>
@@ -92,25 +105,18 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <?php if ($mensagem_sucesso): ?>
-        <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4 alert-dismissible fade show" role="alert">
+        <div class="alert alert-success border-0 shadow-sm mb-4 alert-dismissible fade show" role="alert">
             <i class="fa-solid fa-circle-check me-2 fa-lg"></i>
-            <div><?= $mensagem_sucesso ?></div>
+            <?= $mensagem_sucesso ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 
     <?php if ($mensagem_erro): ?>
-        <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4 alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger border-0 shadow-sm mb-4 alert-dismissible fade show" role="alert">
             <i class="fa-solid fa-triangle-exclamation me-2 fa-lg"></i>
-            <div><?= $mensagem_erro ?></div>
+            <?= $mensagem_erro ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
-
-    <?php if (!empty($busca) && count($livros) === 0): ?>
-        <div class="alert alert-warning border-0 shadow-sm mb-4">
-            <i class="fa-solid fa-circle-exclamation me-2"></i>
-            Nenhum livro encontrado para o termo: <strong>"<?= htmlspecialchars($busca) ?>"</strong>.
         </div>
     <?php endif; ?>
 
@@ -127,11 +133,11 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </tr>
                 </thead>
                 <tbody class="text-secondary">
-                    <?php if (count($livros) === 0 && empty($busca)): ?>
+                    <?php if (count($livros) === 0): ?>
                         <tr>
                             <td colspan="5" class="text-center py-5 text-muted">
                                 <i class="fa-solid fa-box-open d-block mb-2 fa-2x opacity-25"></i>
-                                O acervo está vazio.
+                                Nenhum livro encontrado.
                             </td>
                         </tr>
                     <?php else: ?>
@@ -148,17 +154,19 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= htmlspecialchars($livro['autor']) ?></td>   
                                 <td class="text-center">
                                     <?php 
-                                    $status = $livro['STATUS'] ?? $livro['status'] ?? 'Indisponível';
-                                    $statusClass = ($status == 'Disponível') ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis'; 
+                                    // CORREÇÃO DO STATUS: Verifica maiúsculo e minúsculo
+                                    $status_raw = $livro['status'] ?? $livro['STATUS'] ?? 'Indisponível';
+                                    $is_disponivel = (strcasecmp($status_raw, 'Disponível') == 0);
+                                    $statusClass = $is_disponivel ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis'; 
                                     ?>
-                                    <span class="badge rounded-pill <?= $statusClass ?> px-3"><?= $status ?></span>
+                                    <span class="badge rounded-pill <?= $statusClass ?> px-3"><?= htmlspecialchars($status_raw) ?></span>
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group shadow-sm">
                                         <a href="editar_livro.php?id=<?= $livro['id'] ?>" class="btn btn-white btn-sm border text-primary" title="Editar"><i class="fa-solid fa-pen-to-square"></i></a>
-                                        <form action="excluir_livro.php" method="post" class="d-inline" onsubmit="return confirm('Tem certeza que deseja remover este exemplar do acervo?');">
+                                        <form action="excluir_livro.php" method="post" class="d-inline" onsubmit="return confirm('Tem certeza?');">
                                             <input type="hidden" name="id" value="<?= $livro['id'] ?>">
-                                            <button type="submit" class="btn btn-white btn-sm border text-danger" title="Excluir"><i class="fa-solid fa-trash-can"></i></button>
+                                            <button type="submit" class="btn btn-white btn-sm border text-danger"><i class="fa-solid fa-trash-can"></i></button>
                                         </form>
                                     </div>
                                 </td>
@@ -174,18 +182,15 @@ $livros = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <nav>
                 <ul class="pagination justify-content-center mb-0">
                     <li class="page-item <?= $pagina_atual <= 1 ? 'disabled' : '' ?>">
-                        <a class="page-link text-dark" href="?pagina=<?= $pagina_atual - 1 ?>&busca=<?= urlencode($busca) ?>">Anterior</a>
+                        <a class="page-link text-dark" href="?pagina=<?= $pagina_atual - 1 ?>&busca=<?= urlencode($busca) ?>&tipo_busca=<?= $tipo_busca ?>">Anterior</a>
                     </li>
-                    <?php 
-                    $inicio = max(1, $pagina_atual - 2);
-                    $fim = min($total_paginas, $pagina_atual + 2);
-                    for ($i = $inicio; $i <= $fim; $i++): ?>
+                    <?php for ($i = max(1, $pagina_atual - 2); $i <= min($total_paginas, $pagina_atual + 2); $i++): ?>
                         <li class="page-item <?= $pagina_atual == $i ? 'active' : '' ?>">
-                            <a class="page-link <?= $pagina_atual == $i ? 'bg-dark border-dark text-white' : 'text-dark' ?>" href="?pagina=<?= $i ?>&busca=<?= urlencode($busca) ?>"><?= $i ?></a>
+                            <a class="page-link <?= $pagina_atual == $i ? 'bg-dark border-dark text-white' : 'text-dark' ?>" href="?pagina=<?= $i ?>&busca=<?= urlencode($busca) ?>&tipo_busca=<?= $tipo_busca ?>"><?= $i ?></a>
                         </li>
                     <?php endfor; ?>
                     <li class="page-item <?= $pagina_atual >= $total_paginas ? 'disabled' : '' ?>">
-                        <a class="page-link text-dark" href="?pagina=<?= $pagina_atual + 1 ?>&busca=<?= urlencode($busca) ?>">Próximo</a>
+                        <a class="page-link text-dark" href="?pagina=<?= $pagina_atual + 1 ?>&busca=<?= urlencode($busca) ?>&tipo_busca=<?= $tipo_busca ?>">Próximo</a>
                     </li>
                 </ul>
             </nav>

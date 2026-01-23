@@ -87,7 +87,7 @@ include_once __DIR__ . '/includes/header.php';
                     <form action="salvar_livro.php" method="post">
                         
                         <div class="mb-4">
-                            <label for="numero_registro" class="form-label">Número de Registro (Patrimônio)</label>
+                            <label for="numero_registro" class="form-label">Número de Registro</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
                                 <input type="text" id="numero_registro" name="numero_registro" class="form-control" placeholder="Ex: 20240001" required>
