@@ -18,8 +18,8 @@ if (!$id) {
 
 try {
     // 1. Verificação proativa antes de tentar excluir
-    // Busca se existe um empréstimo 'Pendente' para este livro
-    $stmtCheck = $pdo->prepare("SELECT id FROM emprestimos WHERE livro_id = :id AND status = 'Pendente' LIMIT 1");
+    // Busca se existe algum empréstimo que ainda NÃO foi devolvido
+    $stmtCheck = $pdo->prepare("SELECT id FROM emprestimos WHERE livro_id = :id AND data_devolucao_real IS NULL LIMIT 1");
     $stmtCheck->execute([':id' => $id]);
     $emprestimo = $stmtCheck->fetch();
 

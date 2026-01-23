@@ -74,7 +74,12 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-muted small text-uppercase">Data de Saída</label>
-                                <input type="date" name="data_emprestimo" class="form-control" value="<?= $emprestimo['data_emprestimo'] ?>" required>
+                                <input type="date" 
+                                        name="data_emprestimo" 
+                                        class="form-control bg-light" 
+                                        value="<?= date('Y-m-d', strtotime($emprestimo['data_emprestimo'])) ?>" 
+                                        readonly>
+                                    <div class="form-text text-muted">A data de saída original não pode ser alterada.</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-muted small text-uppercase">Prazo Previsto</label>
