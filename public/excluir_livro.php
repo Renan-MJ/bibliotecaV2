@@ -25,10 +25,10 @@ try {
 
     if ($emprestimo) {
         // Se encontrou empréstimo ativo, bloqueia e envia o link para a gestora
-        $_SESSION['erro'] = "Não é possível excluir: este livro está com um <strong>empréstimo ativo</strong>.<br>
-                            <a href='listar_emprestimos.php?busca=" . $emprestimo['id'] . "' class='btn btn-sm btn-outline-danger mt-2 text-decoration-none'>
-                                <i class='fa-solid fa-arrow-right me-1'></i> Ver empréstimo e dar baixa
-                            </a>";
+        $_SESSION['erro'] = "<strong>Bloqueio de Segurança:</strong> Este livro possui emprestimos registrados no momento.<br>
+                        <a href='listar_emprestimos.php?id_selecionado=" . $emprestimo['id'] . "' class='btn btn-sm btn-outline-danger mt-2'>
+                                <i class='fa-solid fa-arrow-right me-1'></i> Ver emprestimo
+                        </a>";
         header('Location: listar_livros.php');
         exit;
     }
