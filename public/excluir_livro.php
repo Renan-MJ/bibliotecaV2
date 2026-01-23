@@ -25,7 +25,7 @@ try {
 
     if ($emprestimo) {
         // Se encontrou empréstimo ativo, bloqueia e envia o link para a gestora
-        $_SESSION['erro'] = "<strong>Bloqueio de Segurança:</strong> Este livro possui emprestimos registrados no momento.<br>
+        $_SESSION['erro'] = "<strong>Bloqueio de Segurança:</strong> Este livro possui emprestimos registradoss no momento.<br>
                         <a href='listar_emprestimos.php?id_selecionado=" . $emprestimo['id'] . "' class='btn btn-sm btn-outline-danger mt-2'>
                                 <i class='fa-solid fa-arrow-right me-1'></i> Ver emprestimo
                         </a>";
@@ -42,7 +42,11 @@ try {
 
 } catch (PDOException $e) {
     // 3. Caso o livro possua histórico de empréstimos já DEVOLVIDOS que impedem a exclusão (FK)
-    $_SESSION['erro'] = "Este livro não pode ser removido definitivamente pois possui <strong>Empréstimos</strong> no sistema.";
+        $_SESSION['erro'] = "<strong>Bloqueio de Segurança:</strong> Este livro possui emprestimos registradoss no momento.<br>
+                        <a href='listar_emprestimos.php?id_selecionado=" . $emprestimo['id'] . "' class='btn btn-sm btn-outline-danger mt-2'>
+                                <i class='fa-solid fa-arrow-right me-1'></i> Ver emprestimo
+                        </a>";
+        header('Location: listar_livros.php');
 }
 
 header('Location: listar_livros.php');
