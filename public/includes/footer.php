@@ -2,7 +2,7 @@
         <div class="container text-center">
             <div class="row align-items-center">
                 <div class="col-md-4 text-md-start">
-                    <span class="text-muted small">&copy; 2026 Prefeitura Municipal - Gestão de Biblioteca</span>
+                    <span class="text-muted small">&copy; 2026 Prefeitura Municipal - Gestão de Biblioteca  Desenvolvido por Renan Machado Januario.</span>
                 </div>
                 <div class="col-md-4 my-3 my-md-0">
                     <img src="img/logo_prefeitura.png" alt="Brasão" height="90">

@@ -141,7 +141,7 @@ $emprestimos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </td>
                             <td>
                                 <span class="text-dark d-block"><?= htmlspecialchars($e['nome']) ?></span>
-                                <span class="text-muted small">Matrícula: <?= $e['numero_cadastro'] ?></span>
+                                <span class="text-muted small">Nº Cadastro: <?= $e['numero_cadastro'] ?></span>
                             </td>
                             <td class="small">
                                 <div><i class="fa-solid fa-calendar-minus me-1 text-muted"></i> <?= date('d/m/Y', strtotime($e['data_emprestimo'])) ?></div>
