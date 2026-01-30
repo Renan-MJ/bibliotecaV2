@@ -3,11 +3,29 @@ require_once __DIR__ . '/../config/database.php';
 include_once __DIR__ . '/includes/header.php';
 
 // Pega apenas livros que estão 'Disponível'
-$livros = $pdo->query("SELECT id, titulo FROM livros WHERE status = 'Disponível' ORDER BY titulo")->fetchAll(PDO::FETCH_ASSOC);
+$livros = $pdo->query("SELECT id, titulo, autor FROM livros WHERE status = 'Disponível' ORDER BY titulo")->fetchAll(PDO::FETCH_ASSOC);
 
 // Pega todos os leitores
 $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+    /* Ajuste para o Select2 não quebrar dentro do input-group do Bootstrap */
+    .select2-container--bootstrap-5 .select2-selection {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        border-color: #dee2e6 !important;
+    }
+    .select2-container {
+        flex: 1 1 auto; /* Faz o select ocupar o espaço restante do input-group */
+        width: 1% !important;
+    }
+</style>
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -27,8 +45,8 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
                             <label class="form-label fw-bold text-muted small text-uppercase">Livro / Obra</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fa-solid fa-book"></i></span>
-                                <select name="livro_id" class="form-select border-start-0 ps-2" required>
-                                    <option value="">Selecione um exemplar disponível...</option>
+                                <select name="livro_id" id="livro_id" class="form-select select-busca" required>
+                                    <option value="">Pesquisar por título ou autor...</option>
                                     <?php foreach ($livros as $livro): ?>
                                         <option value="<?= $livro['id'] ?>">
                                             <?= htmlspecialchars($livro['titulo']) ?> (ID: <?= $livro['id'] ?>)
@@ -45,8 +63,8 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
                             <label class="form-label fw-bold text-muted small text-uppercase">Leitor / Cidadão</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fa-solid fa-user"></i></span>
-                                <select name="leitor_id" class="form-select border-start-0 ps-2" required>
-                                    <option value="">Selecione o beneficiário...</option>
+                                <select name="leitor_id" id="leitor_id" class="form-select select-busca" required>
+                                    <option value="">Pesquisar por nome ou nº cadastro...</option>
                                     <?php foreach ($leitores as $leitor): ?>
                                         <option value="<?= $leitor['id'] ?>">
                                             <?= htmlspecialchars($leitor['nome']) ?> (Nº: <?= $leitor['numero_cadastro'] ?>)
@@ -90,6 +108,18 @@ $leitores = $pdo->query("SELECT id, nome, numero_cadastro FROM leitores ORDER BY
 </div>
 
 <script>
+    // Ativação do Select2 nos campos de busca
+    $(document).ready(function() {
+        $('.select-busca').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Clique para pesquisar...',
+            allowClear: true,
+            language: {
+                noResults: function() { return "Nenhum registro encontrado"; }
+            }
+        });
+    });
+
     const inputRetorno = document.getElementById('data_devolucao_prevista');
 
     function calcularSugestao() {
