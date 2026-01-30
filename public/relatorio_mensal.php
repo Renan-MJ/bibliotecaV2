@@ -120,7 +120,7 @@ include_once __DIR__ . '/includes/header.php';
             <h5 class="mb-1">Prefeitura Municípal de Pontal do Paraná</h5>
             <h6 class="mb-3 text-uppercase">Relatório de Movimentação de Biblioteca</h6>
             <p class="small mb-0">Período: <?= $meses_extenso[$mes_selecionado] ?> / <?= $ano_selecionado ?></p>
-            <p class="small mb-0">Emitido em: <?= date('d/m/Y H:i', strtotime('-3 hours')) ?></p>
+            <p class="small mb-0">Emitido em: <?= date('d/m/Y H:i') ?></p>
         </div>
     </div>
 
