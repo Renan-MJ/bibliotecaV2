@@ -21,7 +21,7 @@ include_once __DIR__ . '/includes/header.php';
     .form-label {
         font-weight: 600;
         font-size: 0.85rem;
-        text-uppercase;
+
         letter-spacing: 0.5px;
         color: var(--bs-secondary-color);
     }
@@ -90,7 +90,7 @@ include_once __DIR__ . '/includes/header.php';
                             <label for="numero_registro" class="form-label">Número de Registro</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
-                                <input type="text" id="numero_registro" name="numero_registro" class="form-control" placeholder="Ex: 20240001" required>
+                                <input type="text" name="numero_registro" class="form-control" placeholder="Ex: 10/2" required>
                             </div>
                         </div>
 

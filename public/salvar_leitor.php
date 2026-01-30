@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Captura e limpeza básica de dados
 $numero_cadastro = $_POST['numero_cadastro'] ?? '';
 $nome            = $_POST['nome'] ?? '';
+$data_nascimento = $_POST['data_nascimento'] ?? ''; // NOVO CAMPO
 $filiacao        = $_POST['filiacao'] ?? '';
 $rg              = $_POST['rg'] ?? '';
 $telefone        = $_POST['telefone'] ?? '';
@@ -26,14 +27,15 @@ if (empty($numero_cadastro) || empty($nome)) {
 }
 
 try {
-    // SQL alterado: trocamos CURDATE() por NOW() para capturar o horário exato
-    $sql = "INSERT INTO leitores (numero_cadastro, nome, filiacao, rg, telefone, email, endereco, data_cadastro)
-            VALUES (:numero_cadastro, :nome, :filiacao, :rg, :telefone, :email, :endereco, NOW())";
+    // SQL alterado: Incluído o campo data_nascimento
+    $sql = "INSERT INTO leitores (numero_cadastro, nome, data_nascimento, filiacao, rg, telefone, email, endereco, data_cadastro)
+            VALUES (:numero_cadastro, :nome, :data_nascimento, :filiacao, :rg, :telefone, :email, :endereco, NOW())";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ':numero_cadastro' => $numero_cadastro,
         ':nome'            => $nome,
+        ':data_nascimento' => $data_nascimento, // BIND DO NOVO CAMPO
         ':filiacao'        => $filiacao,
         ':rg'              => $rg,
         ':telefone'        => $telefone,
@@ -47,7 +49,6 @@ try {
     exit;
 
 } catch (PDOException $e) {
-    // Caso o erro seja de coluna não encontrada, certifique-se de ter rodado o ALTER TABLE enviado antes
     $_SESSION['erro'] = "Erro ao realizar o cadastro. Detalhes: " . $e->getMessage();
     header('Location: cadastrar_leitor.php');
     exit;

@@ -63,6 +63,14 @@ if (!$leitor) {
                             </div>
 
                             <div class="col-12">
+                                <label class="form-label fw-bold text-muted small text-uppercase">Data de Nascimento</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-calendar-day text-muted"></i></span>
+                                    <input type="date" name="data_nascimento" class="form-control border-start-0 ps-0" value="<?= $leitor['data_nascimento'] ?>">
+                                </div>
+                            </div>
+
+                            <div class="col-12">
                                 <label class="form-label fw-bold text-muted small text-uppercase">Filiação</label>
                                 <input type="text" name="filiacao" class="form-control bg-light-subtle" value="<?= htmlspecialchars($leitor['filiacao']) ?>" placeholder="Nome dos pais ou responsáveis">
                             </div>

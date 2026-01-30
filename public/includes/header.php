@@ -51,14 +51,14 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <li class="nav-item">
-            <a class="nav-link <?= strpos($_SERVER['PHP_SELF'], 'index.php') !== false ? 'active fw-bold' : '' ?>" href="index.php">
-                <i class="fa-solid fa-house me-1"></i> Início
-            </a>
-        </li>
-        
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link <?= ($pagina_atual == 'index.php') ? 'active' : '' ?>" href="index.php">
+                        <i class="fa-solid fa-house me-1"></i> Início
+                    </a>
+                </li>
+                
                 <li class="nav-item">
                     <a class="nav-link <?= ($pagina_atual == 'listar_livros.php' || $pagina_atual == 'cadastrar_livro.php') ? 'active' : '' ?>" href="listar_livros.php">
                         <i class="fa-solid fa-book me-1"></i> Acervo
@@ -66,7 +66,7 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link <?= ($pagina_atual == 'listar_leitores.php' || $pagina_atual == 'cadastrar_leitor.php') ? 'active' : '' ?>" href="listar_leitores.php">
+                    <a class="nav-link <?= ($pagina_atual == 'listar_leitores.php' || $pagina_atual == 'cadastrar_leitor.php' || $pagina_atual == 'editar_leitor.php') ? 'active' : '' ?>" href="listar_leitores.php">
                         <i class="fa-solid fa-users me-1"></i> Leitores
                     </a>
                 </li>
@@ -76,18 +76,26 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
                         <i class="fa-solid fa-handshake me-1"></i> Empréstimos
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <?= ($pagina_atual == 'relatorio_mensal.php') ? 'active' : '' ?>" href="relatorio_mensal.php">
+                        <i class="fa-solid fa-chart-line me-1"></i> Relatórios
+                    </a>
+                </li>
             </ul>
             
             <div class="user-profile d-none d-lg-flex align-items-center">
                 <a href="javascript:location.reload();" class="btn-reload me-3" title="Recarregar página">
                     <i class="fa-solid fa-rotate-right"></i>
                 </a>
-                <li class="nav-item">
-                    <a class="nav-link" href="consulta_cdd.php">
-                        <i class="fa-solid fa-file-arrow-down me-1 "></i> Baixar CDD
-                    </a>
-                </li>
-                <small class="me-3 text-white-50">Olá, <strong>Gestor(a)</strong></small>
+                <ul class="navbar-nav me-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="consulta_cdd.php">
+                            <i class="fa-solid fa-file-arrow-down me-1"></i> Baixar CDD
+                        </a>
+                    </li>
+                </ul>
+                <small class="text-white-50">Olá, <strong>Gestor(a)</strong></small>
             </div>
         </div>
     </div>

@@ -35,6 +35,14 @@
                             </div>
 
                             <div class="col-md-12 mb-4">
+                                <label class="form-label fw-semibold text-muted">Data de Nascimento</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fa-solid fa-calendar-day"></i></span>
+                                    <input type="date" name="data_nascimento" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-4">
                                 <label class="form-label fw-semibold text-muted">Filiação</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light"><i class="fa-solid fa-users-rectangle"></i></span>

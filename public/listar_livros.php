@@ -1,12 +1,14 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
-include_once __DIR__ . '/includes/header.php';
+
 
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 $mensagem_sucesso = $_SESSION['sucesso'] ?? '';
 $mensagem_erro = $_SESSION['erro'] ?? '';
 unset($_SESSION['sucesso'], $_SESSION['erro']);
+
+require_once __DIR__ . '/../config/database.php';
+include_once __DIR__ . '/includes/header.php';
 
 // 2. Configurações de Paginação
 $itens_por_pagina = 10;

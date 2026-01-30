@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $id              = $_POST['id'] ?? null;
 $numero_cadastro = $_POST['numero_cadastro'] ?? '';
 $nome            = $_POST['nome'] ?? '';
+$data_nascimento = $_POST['data_nascimento'] ?? ''; // NOVO CAMPO CAPTURADO
 $filiacao        = $_POST['filiacao'] ?? '';
 $rg              = $_POST['rg'] ?? '';
 $telefone        = $_POST['telefone'] ?? '';
@@ -27,10 +28,11 @@ if (!$id || empty($numero_cadastro) || empty($nome)) {
 }
 
 try {
-    // SQL organizada e segura
+    // SQL organizada e segura - Adicionado data_nascimento ao SET
     $sql = "UPDATE leitores 
             SET numero_cadastro = :numero_cadastro, 
                 nome = :nome, 
+                data_nascimento = :data_nascimento,
                 filiacao = :filiacao,
                 rg = :rg, 
                 telefone = :telefone, 
@@ -42,6 +44,7 @@ try {
     $stmt->execute([
         ':numero_cadastro' => $numero_cadastro,
         ':nome'            => $nome,
+        ':data_nascimento' => $data_nascimento, // BIND DO NOVO CAMPO
         ':filiacao'        => $filiacao,
         ':rg'              => $rg,
         ':telefone'        => $telefone,
@@ -58,7 +61,6 @@ try {
 } catch (PDOException $e) {
     // Tratamento de erro caso o banco de dados falhe
     $_SESSION['erro'] = "Erro técnico ao atualizar o leitor. Por favor, contate o suporte.";
-    // Opcional: logar o erro $e->getMessage() para o desenvolvedor
     header('Location: listar_leitores.php');
     exit;
 }

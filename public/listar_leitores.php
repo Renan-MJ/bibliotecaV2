@@ -1,6 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
-include_once __DIR__ . '/includes/header.php';
+
 
 // 1. Inicia a sessão e captura mensagens
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
@@ -9,6 +8,8 @@ $mensagem_sucesso = $_SESSION['sucesso'] ?? '';
 $mensagem_erro = $_SESSION['erro'] ?? '';
 unset($_SESSION['sucesso'], $_SESSION['erro']);
 
+require_once __DIR__ . '/../config/database.php';
+include_once __DIR__ . '/includes/header.php';
 // 2. Configurações de Paginação
 $itens_por_pagina = 10;
 $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
@@ -142,6 +143,14 @@ $leitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </td>
                                 <td>
                                     <span class="text-dark fw-bold d-block"><?= htmlspecialchars($leitor['nome']) ?></span>
+                                    
+                                    <?php if (!empty($leitor['data_nascimento']) && $leitor['data_nascimento'] !== '0000-00-00'): ?>
+                                        <div class="small text-muted mb-1">
+                                            <i class="fa-solid fa-cake-candles me-1 text-info opacity-75"></i> 
+                                            Nasc: <?= date('d/m/Y', strtotime($leitor['data_nascimento'])) ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    
                                     <span class="text-muted small">F: <?= htmlspecialchars($leitor['filiacao']) ?></span>
                                 </td>
                                 <td>

@@ -1,10 +1,12 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
-include_once __DIR__ . '/includes/header.php';
 
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 $mensagem_sucesso = $_SESSION['sucesso'] ?? '';
 unset($_SESSION['sucesso']);
+
+require_once __DIR__ . '/../config/database.php';
+include_once __DIR__ . '/includes/header.php';
+
 
 $data_hoje = date('Y-m-d');
 
