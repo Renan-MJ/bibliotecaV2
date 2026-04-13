@@ -2,7 +2,9 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Inicia a sessão no topo para garantir que as mensagens funcionem
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) { 
+    session_start(); 
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: listar_leitores.php');
@@ -12,12 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Captura e limpeza básica de dados
 $numero_cadastro = $_POST['numero_cadastro'] ?? '';
 $nome            = $_POST['nome'] ?? '';
-$data_nascimento = $_POST['data_nascimento'] ?? ''; // NOVO CAMPO
 $filiacao        = $_POST['filiacao'] ?? '';
 $rg              = $_POST['rg'] ?? '';
 $telefone        = $_POST['telefone'] ?? '';
 $email           = $_POST['email'] ?? '';
 $endereco        = $_POST['endereco'] ?? '';
+
+// TRATAMENTO DA DATA: Se o campo vier vazio, define como null para evitar erro de formato no MySQL
+$data_nascimento = !empty($_POST['data_nascimento']) ? $_POST['data_nascimento'] : null;
 
 // Validação de campos obrigatórios
 if (empty($numero_cadastro) || empty($nome)) {
@@ -35,7 +39,7 @@ try {
     $stmt->execute([
         ':numero_cadastro' => $numero_cadastro,
         ':nome'            => $nome,
-        ':data_nascimento' => $data_nascimento, // BIND DO NOVO CAMPO
+        ':data_nascimento' => $data_nascimento, // BIND DO NOVO CAMPO TRATADO
         ':filiacao'        => $filiacao,
         ':rg'              => $rg,
         ':telefone'        => $telefone,
@@ -49,6 +53,7 @@ try {
     exit;
 
 } catch (PDOException $e) {
+    // Exibe o erro real para facilitar a correção caso falte a coluna no banco
     $_SESSION['erro'] = "Erro ao realizar o cadastro. Detalhes: " . $e->getMessage();
     header('Location: cadastrar_leitor.php');
     exit;
